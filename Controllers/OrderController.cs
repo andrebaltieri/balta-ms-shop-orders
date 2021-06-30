@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OrdersApi.Data;
+using OrdersApi.Enums;
 using OrdersApi.Models;
 using OrdersApi.ViewModels;
 
@@ -27,7 +28,7 @@ namespace OrdersApi.Controllers
             int id,
             [FromServices] StoreDataContext context)
         {
-            var orders = await context.Orders.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var orders = await context.Orders.AsNoTracking().Include(x => x.Items).ThenInclude(x => x.Product).FirstOrDefaultAsync(x => x.Id == id);
             return Ok(orders);
         }
 
@@ -41,6 +42,7 @@ namespace OrdersApi.Controllers
                 Customer = model.Customer,
                 Date = DateTime.Now,
                 Number = Guid.NewGuid().ToString().Substring(0, 8),
+                Status = EOrderStatus.Paid,
                 Id = 0,
             };
 
@@ -48,10 +50,13 @@ namespace OrdersApi.Controllers
             {
                 order.Items.Add(new OrderItem
                 {
-                    Price = 0,
+                    Price = item.Price,
                     Product = item
                 });
             }
+
+            await context.Orders.AddAsync(order);
+            await context.SaveChangesAsync();
 
             return Ok(order);
         }

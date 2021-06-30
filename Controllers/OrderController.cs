@@ -82,7 +82,7 @@ namespace OrdersApi.Controllers
 
         [HttpPut("{id}/status")]
         public async Task<IActionResult> PutAsync(
-            [FromQuery] Guid id,
+            [FromRoute] Guid id,
             [FromBody] UpdateOrderStatusViewModel model,
             [FromServices] StoreDataContext context,
             [FromServices] NotificationService notificationService,

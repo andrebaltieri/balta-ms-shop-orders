@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using OrdersApi.Data;
+using OrdersApi.Services;
 
 namespace OrdersApi
 {
@@ -31,6 +32,9 @@ namespace OrdersApi
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
             services.AddHealthChecks();
+
+            services.AddTransient<NotificationService>();
+            services.AddTransient<MessageBusService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

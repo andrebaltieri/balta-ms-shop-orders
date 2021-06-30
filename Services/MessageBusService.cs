@@ -17,12 +17,15 @@ namespace OrdersApi.Services
 
         public async Task SendAsync(Order order)
         {
-            var connectionString = _configuration["ServiceBusConnectionString"];
-            const string queueName = "orders";
+            await SendAsync(order, "orders");
+        }
 
+        public async Task SendAsync(Order order, string queue)
+        {
+            var connectionString = _configuration["ServiceBusConnectionString"];
             await using var client = new ServiceBusClient(connectionString);
 
-            var sender = client.CreateSender(queueName);
+            var sender = client.CreateSender(queue);
             var json = JsonSerializer.Serialize(order);
             var message = new ServiceBusMessage(json);
 
